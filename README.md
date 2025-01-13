@@ -87,13 +87,3 @@ Este proyecto está bajo la licencia **MIT**, lo que significa que puedes utiliz
 
 **Autor:** 0xfabrica 
 **Contacto:** intelligroow@gmail.com
-
-```
-
-### Detalles clave
-1. **Dataset:** Explicación clara de que los datos son de Kaggle y no contienen información sensible.
-2. **Instrucciones claras:** Desde la instalación hasta la ejecución, es fácil de seguir.
-3. **Licencia:** Consideré **MIT**, pero puedes cambiarla si lo prefieres.
-4. **Formato limpio y profesional:** Facilita la lectura en GitHub.
-
-Puedes ajustar nombres y enlaces según corresponda. 😊

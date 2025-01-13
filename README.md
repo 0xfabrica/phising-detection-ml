@@ -1,4 +1,3 @@
-```markdown
 # Proyecto de Detección de Phishing con Machine Learning
 
 Este proyecto tiene como objetivo desarrollar un modelo de machine learning para detectar URLs sospechosas de phishing, utilizando un dataset público obtenido de [Kaggle](https://www.kaggle.com). La aplicación está implementada con **Streamlit**, ofreciendo una interfaz visual interactiva para que los usuarios puedan realizar predicciones y consultar la documentación técnica asociada.

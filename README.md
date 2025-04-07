@@ -1,89 +1,52 @@
-# Proyecto de Detección de Phishing con Machine Learning
+# Proyecto de Detección de URLs Maliciosas con Machine Learning
 
-Este proyecto tiene como objetivo desarrollar un modelo de machine learning para detectar URLs sospechosas de phishing, utilizando un dataset público obtenido de [Kaggle](https://www.kaggle.com). La aplicación está implementada con **Streamlit**, ofreciendo una interfaz visual interactiva para que los usuarios puedan realizar predicciones y consultar la documentación técnica asociada.
+Este proyecto tiene como objetivo desarrollar un modelo de machine learning para detectar URLs maliciosas (spam o phishing), utilizando un dataset  ('dataa.csv'). Se implementan dos modelos: RandomForestClassifier y XGBoost, para ofrecer una solución robusta y precisa.
+
 
 ## Descripción del Proyecto
 
-El sistema está diseñado para identificar posibles URLs de phishing analizando múltiples características, como:
+El sistema está diseñado para identificar posibles URLs maliciosas analizando múltiples características, como:
 - Nivel del subdominio.
 - Longitud de la URL.
-- Presencia de palabras sospechosas, entre otros.
+- Presencia de ciertos caracteres, como '@', '~', '_', '%'.
+- Uso de iframes o frames.
+- Títulos faltantes en la página.
+- Entre otras.
 
-### Características principales
-1. **Predicción interactiva:** Los usuarios pueden ingresar características manualmente y recibir predicciones en tiempo real.
-2. **Documentación detallada:** Una página separada proporciona información completa sobre los inputs, el algoritmo usado, y las métricas del modelo.
-3. **Interfaz de usuario moderna:** Desarrollada con **Streamlit**, para una experiencia visual amigable y profesional.
 
 ## Dataset
 
-El dataset utilizado para entrenar y evaluar el modelo fue obtenido de [Kaggle](https://www.kaggle.com), y no contiene información confidencial ni sensible de ninguna persona o entidad. Es un conjunto de datos exclusivamente diseñado para fines educativos y de investigación en el ámbito del machine learning.
+Se utiliza un conjunto de datos ('dataa.csv') que contiene características de URLs. La columna 'CLASS_LABEL' indica si una URL es maliciosa (1.0) o benigna (0.0).
 
-## Algoritmo y Resultados
 
-El modelo implementado es un **Random Forest Classifier**, elegido por su robustez y rendimiento en problemas de clasificación. A continuación, se presentan las métricas obtenidas durante la evaluación:
+## Algoritmos y Resultados
 
-- **Precisión:** 98%
-- **Recall:** 96%
-- **F1-Score:** 97%
-- **Matriz de confusión:**
-  - Verdaderos Positivos: 120
-  - Verdaderos Negativos: 130
-  - Falsos Positivos: 5
-  - Falsos Negativos: 3
+Se implementan dos modelos de Machine Learning para la clasificación:
 
-## Requisitos del Sistema
+1. **RandomForest Classifier:** Un modelo de conjunto basado en árboles de decisión.
+2. **XGBoost:** Un algoritmo de boosting de gradiente conocido por su alto rendimiento.
+
+**Resultados:**
+
+*   **RandomForest:** Obtiene una precisión aceptable, pero XGBoost muestra un rendimiento ligeramente superior, especialmente en la detección de URLs maliciosas (clase 1.0).
+*   **XGBoost:** Se guarda el modelo entrenado en un archivo 'modelo_xgboost.json' para su uso posterior.
+
+**Métricas:**
+
+Se evalúan los modelos utilizando métricas como la precisión (accuracy), la matriz de confusión y el informe de clasificación. Puedes consultar el código para ver los resultados detallados de cada modelo.
+
+**Matriz de confusión (Ejemplo - XGBoost):**
+  - Verdaderos Negativos (VN): 1354
+  - Verdaderos Positivos (VP): 1453
+  - Falsos Positivos (FP): 109
+  - Falsos Negativos (FN): 84
 
 Asegúrate de tener instalado lo siguiente en tu entorno:
 
 - Python 3.8 o superior
-- Librerías requeridas (ver más abajo)
+- Librerías: pandas, numpy, scikit-learn, xgboost, matplotlib, seaborn.
 
-### Instalación de dependencias
-1. Clona este repositorio:
-   ```bash
-   git clone https://github.com/0xfabrica/phising-detection-ml.git
-   ```
-2. Navega al directorio del proyecto:
-   ```bash
-   cd nombre-del-repositorio
-   ```
-3. Crea un entorno virtual (opcional, pero recomendado):
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # En Windows: venv\Scripts\activate
-   ```
-4. Instala las dependencias:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-### Ejecución
-Inicia la aplicación localmente ejecutando:
-```bash
-streamlit run main.py
+Puedes instalar las librerías necesarias ejecutando el siguiente comando en tu entorno de Colab:
 ```
-Esto abrirá la interfaz en tu navegador predeterminado.
-
-## Estructura del Proyecto
-
-```plaintext
-├── main.py               # Archivo principal para la aplicación Streamlit
-├── docs.py               # Documento con la explicación de inputs y métricas
-├── algoritmo_streamlit.py # Lógica del modelo y predicciones
-├── dataset/              # Dataset utilizado (en caso de incluirlo)
-├── requirements.txt      # Dependencias necesarias
-└── README.md             # Este archivo
+bash !pip install pandas numpy scikit-learn xgboost matplotlib seaborn
 ```
-
-## Licencia
-
-Este proyecto está bajo la licencia **MIT**, lo que significa que puedes utilizarlo, modificarlo y distribuirlo libremente, siempre y cuando menciones la autoría original.
-
-## Contribuciones
-
-¡Contribuciones son bienvenidas! Si encuentras algún problema o tienes ideas para mejorar el proyecto, no dudes en crear un *issue* o enviar un *pull request*.
-
----
-
-**Autor:** 0xfabrica 
-**Contacto:** intelligroow@gmail.com

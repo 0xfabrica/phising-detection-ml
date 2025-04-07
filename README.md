@@ -48,5 +48,5 @@ Asegúrate de tener instalado lo siguiente en tu entorno:
 
 Puedes instalar las librerías necesarias ejecutando el siguiente comando en tu entorno de Colab:
 ```
-bash !pip install pandas numpy scikit-learn xgboost matplotlib seaborn
+pip install pandas numpy scikit-learn xgboost matplotlib seaborn
 ```

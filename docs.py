@@ -56,7 +56,6 @@ def mostrar_explicacion_inputs():
         - **AbnormalExtFormActionR**: Indica si las acciones de formularios externos son anormales (valor codificado, e.g., -1, 0, 1). Las acciones inusuales suelen estar asociadas con phishing.
         - **ExtMetaScriptLinkRT**: Análisis de riesgo de scripts, metadatos y enlaces externos (valor codificado). Un valor más negativo indica mayor probabilidad de phishing.
         - **PctExtNullSelfRedirectHyperlinksRT**: Porcentaje de hipervínculos que redirigen a sí mismos o son nulos, con análisis de riesgo (valor codificado). Un valor alto puede ser un indicador de phishing.
-        - **CLASS_LABEL (Variable objetivo)**: Etiqueta objetivo del modelo, donde `1.0` indica una URL de phishing (positiva) y `0.0` indica una URL legítima (negativa).
         """)
 
     st.container()

@@ -1,24 +1,20 @@
 import streamlit as st
 import pandas as pd
-from algoritmo_streamlit import cargar_datos, cargar_modelo, prediccion_manual, entrenar_modelo
+import numpy as np
+import xgboost as xgb
 from docs import mostrar_explicacion_inputs
 
-
-# Cargar los datos y entrenar el modelo
-datos = cargar_datos('data.csv')  # Asegúrate de proporcionar la ruta correcta al archivo CSV
-entrenar_modelo(datos)
-
 # Agregar la opción al sidebar
-opcion = st.sidebar.selectbox("Selecciona una opción", [ "Predecir URL", "Documentación"])
+opcion = st.sidebar.selectbox("Selecciona una opción", ["Predecir URL", "Documentación"])
 if opcion == "Documentación":
     mostrar_explicacion_inputs()
 elif opcion == "Predecir URL":
     # Código para la predicción de la URL
     pass
 
-
-# Cargar el modelo y el scaler
-modelo, scaler = cargar_modelo()
+path = 'modelo_xgboost.json'
+modelo = xgb.XGBClassifier()
+modelo.load_model(path)
 
 # Título de la aplicación
 st.title('Detección de Phishing en URLs')
@@ -30,38 +26,100 @@ Este es un sistema de detección de phishing en URLs utilizando un modelo de Ran
 
 # Entrada de características de la URL
 st.sidebar.header("Introducir Características de la URL")
-subdomain_level = st.sidebar.slider("Subdomain Level", min_value=0, max_value=5, value=2)
-num_dots = st.sidebar.slider("Número de Puntos", min_value=1, max_value=10, value=3)
-path_level = st.sidebar.slider("Path Level", min_value=0, max_value=5, value=1)
-ip_address = st.sidebar.selectbox("¿Contiene IP en la URL?", ["Sí", "No"])
-insecure_forms = st.sidebar.selectbox("¿Contiene formularios inseguros?", ["Sí", "No"])
-pct_ext_hyperlinks = st.sidebar.slider("Porcentaje de Enlaces Externos", min_value=0, max_value=100, value=20)
-num_sensitive_words = st.sidebar.slider("Número de Palabras Sensibles", min_value=0, max_value=10, value=2)
-embedded_brand_name = st.sidebar.selectbox("¿Contiene Nombre de Marca Embebido?", ["Sí", "No"])
 
-# Convertir respuestas a valores numéricos
-ip_address = 1 if ip_address == "Sí" else 0
-insecure_forms = 1 if insecure_forms == "Sí" else 0
-embedded_brand_name = 1 if embedded_brand_name == "Sí" else 0
+num_dots = st.sidebar.slider("Número de Puntos en URL", min_value=0, max_value=10, value=3)
+subdomain_level = st.sidebar.slider("Nivel de Subdominios", min_value=0, max_value=5, value=2)
+path_level = st.sidebar.slider("Nivel de Ruta", min_value=0, max_value=10, value=2)
+url_length = st.sidebar.slider("Longitud de URL", min_value=0, max_value=500, value=100)
+num_dash = st.sidebar.slider("Número de Guiones", min_value=0, max_value=20, value=0)
+num_dash_hostname = st.sidebar.slider("Número de Guiones en Hostname", min_value=0, max_value=10, value=0)
+at_symbol = st.sidebar.selectbox("¿Contiene Símbolo @?", ["Sí", "No"])
+tilde_symbol = st.sidebar.selectbox("¿Contiene Símbolo ~?", ["Sí", "No"])
+num_underscore = st.sidebar.slider("Número de Guiones Bajos", min_value=0, max_value=20, value=0)
+num_percent = st.sidebar.slider("Número de Símbolos %", min_value=0, max_value=20, value=0)
+iframe_or_frame = st.sidebar.selectbox("¿Contiene iframe o frame?", ["Sí", "No"])
+missing_title = st.sidebar.selectbox("¿Falta el título?", ["Sí", "No"])
+images_only_in_form = st.sidebar.selectbox("¿Solo imágenes en formulario?", ["Sí", "No"])
+subdomain_level_rt = st.sidebar.slider("Ratio de Nivel de Subdominios", min_value=0.0, max_value=1.0, value=0.0, step=0.1)
+url_length_rt = st.sidebar.slider("Ratio de Longitud URL", min_value=0.0, max_value=1.0, value=0.0, step=0.1)
+pct_ext_resource_urls_rt = st.sidebar.slider("% URLs Recursos Externos", min_value=0.0, max_value=1.0, value=0.0, step=0.1)
+abnormal_ext_form_action_r = st.sidebar.selectbox("¿Acción de Formulario Externa Anormal?", ["Sí", "No"])
+ext_meta_script_link_rt = st.sidebar.slider("Ratio Meta Script Links Externos", min_value=0.0, max_value=1.0, value=0.0, step=0.1)
+pct_ext_null_self_redirect_hyperlinks_rt = st.sidebar.slider("% Enlaces Nulos/Redirección", min_value=0.0, max_value=1.0, value=0.0, step=0.1)
 
-# Recolectar inputs
+# Convertir respuestas Sí/No a valores numéricos
+at_symbol = 1 if at_symbol == "Sí" else 0
+tilde_symbol = 1 if tilde_symbol == "Sí" else 0
+iframe_or_frame = 1 if iframe_or_frame == "Sí" else 0
+missing_title = 1 if missing_title == "Sí" else 0
+images_only_in_form = 1 if images_only_in_form == "Sí" else 0
+abnormal_ext_form_action_r = 1 if abnormal_ext_form_action_r == "Sí" else 0
+
+# Actualizar el diccionario de inputs
 inputs = {
-    'SubdomainLevel': subdomain_level,
     'NumDots': num_dots,
+    'SubdomainLevel': subdomain_level,
     'PathLevel': path_level,
-    'IpAddress': ip_address,
-    'InsecureForms': insecure_forms,
-    'PctExtHyperlinks': pct_ext_hyperlinks,
-    'NumSensitiveWords': num_sensitive_words,
-    'EmbeddedBrandName': embedded_brand_name
+    'UrlLength': url_length,
+    'NumDash': num_dash,
+    'NumDashInHostname': num_dash_hostname,
+    'AtSymbol': at_symbol,
+    'TildeSymbol': tilde_symbol,
+    'NumUnderscore': num_underscore,
+    'NumPercent': num_percent,
+    'IframeOrFrame': iframe_or_frame,
+    'MissingTitle': missing_title,
+    'ImagesOnlyInForm': images_only_in_form,
+    'SubdomainLevelRT': subdomain_level_rt,
+    'UrlLengthRT': url_length_rt,
+    'PctExtResourceUrlsRT': pct_ext_resource_urls_rt,
+    'AbnormalExtFormActionR': abnormal_ext_form_action_r,
+    'ExtMetaScriptLinkRT': ext_meta_script_link_rt,
+    'PctExtNullSelfRedirectHyperlinksRT': pct_ext_null_self_redirect_hyperlinks_rt
 }
+
+def realizar_prediccion(modelo, inputs):
+    # Convertir el diccionario de inputs a DataFrame
+    df = pd.DataFrame([inputs])
+    
+    # Asegurar el orden correcto de las columnas
+    columnas_esperadas = [
+        'NumDots', 'SubdomainLevel', 'PathLevel', 'UrlLength', 'NumDash',
+        'NumDashInHostname', 'AtSymbol', 'TildeSymbol', 'NumUnderscore',
+        'NumPercent', 'IframeOrFrame', 'MissingTitle', 'ImagesOnlyInForm',
+        'SubdomainLevelRT', 'UrlLengthRT', 'PctExtResourceUrlsRT',
+        'AbnormalExtFormActionR', 'ExtMetaScriptLinkRT',
+        'PctExtNullSelfRedirectHyperlinksRT'
+    ]
+    
+    df = df[columnas_esperadas]
+    
+    # Realizar predicción
+    try:
+        prediccion = modelo.predict(df)[0]
+        probabilidad = modelo.predict_proba(df)[0]
+        return prediccion, probabilidad
+    except Exception as e:
+        st.error(f"Error en la predicción: {str(e)}")
+        return None, None
 
 # Realizar predicción
 if st.button("Predecir"):
-    resultado = prediccion_manual(modelo, scaler, inputs)
+    prediccion, probabilidad = realizar_prediccion(modelo, inputs)
     
-    if resultado == 1:
-        st.error("¡La URL es phishing!")
-    else:
-        st.success("La URL es segura.")
+    if prediccion is not None:
+        if prediccion == 1:
+            st.error("⚠️ ¡ALERTA! Esta URL es probablemente phishing!")
+            st.warning(f"Probabilidad de ser phishing: {probabilidad[1]:.2%}")
+        else:
+            st.success("✅ Esta URL parece segura")
+            st.info(f"Probabilidad de ser legítima: {probabilidad[0]:.2%}")
+        
+        # Mostrar detalles adicionales
+        with st.expander("Ver detalles del análisis"):
+            st.write("Valores analizados:", inputs)
+            st.write("Probabilidades:", {
+                "Legítimo": f"{probabilidad[0]:.2%}",
+                "Phishing": f"{probabilidad[1]:.2%}"
+            })
 
